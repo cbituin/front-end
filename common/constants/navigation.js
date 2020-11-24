@@ -132,6 +132,10 @@ export const footerItems = {
     whoWeServeLink,
   ],
   column3: [
+    {
+      href: '/podcasts',
+      name: 'Podcast',
+    },
     getInvolvedLink,
     {
       href: '/podcast',
