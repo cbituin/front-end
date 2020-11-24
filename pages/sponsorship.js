@@ -1,30 +1,23 @@
 import Head from 'components/head';
-import { donateLink } from 'common/constants/urls';
 import HeroBanner from 'components/HeroBanner/HeroBanner';
 import Content from 'components/Content/Content';
 import Badge from 'components/Badge/Badge';
 import Card from 'components/Cards/Card/Card';
 import FlatCard from 'components/Cards/FlatCard/FlatCard';
-import LinkButton from 'components/LinkButton/LinkButton';
+import LinkButton from 'components/Buttons/LinkButton/LinkButton';
 import SponsorsSection from 'components/ReusableSections/SponsorsSection/SponsorsSection';
 import MedalSolid from 'static/images/icons/FontAwesome/medal-solid.svg';
+import styles from './styles/sponsorship.module.css';
 
-import styles from './styles/sponsorship.css';
+const pageTitle = 'Corporate Sponsorship';
 
-export default () => {
-  const pageTitle = 'Corporate Sponsorship';
-
+function Sponsorship() {
   return (
-    <>
+    <div className={styles.Sponsorship}>
       <Head title={pageTitle} />
 
       <HeroBanner title={pageTitle}>
-        <LinkButton
-          href={donateLink}
-          analyticsEventLabel="Donate"
-          theme="primary"
-          className={styles.topMargin}
-        >
+        <LinkButton href="/donate" theme="primary" className={styles.topMargin}>
           Donate Now
         </LinkButton>
       </HeroBanner>
@@ -138,6 +131,8 @@ export default () => {
       />
 
       <SponsorsSection />
-    </>
+    </div>
   );
-};
+}
+
+export default Sponsorship;

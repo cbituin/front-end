@@ -1,10 +1,10 @@
 import Router from 'next/router';
 import nextCookie from 'next-cookies';
-import { setAuthCookies, removeAuthCookies, isTokenValid } from './cookie-utils';
+import { setAuthCookies, removeAuthCookies, hasValidAuthToken } from './cookie-utils';
 
-export const login = ({ token, user }, routeTo = '/profile') => {
-  setAuthCookies({ token, user });
-  Router.push(routeTo);
+export const login = async ({ token }, routeTo = '/profile') => {
+  setAuthCookies({ token });
+  await Router.push(routeTo);
 };
 
 export const logout = ({ routeTo = '/login', shouldRedirect = true } = {}) => {
@@ -22,7 +22,7 @@ export const logout = ({ routeTo = '/login', shouldRedirect = true } = {}) => {
  * @export
  * @param {{
  *   pathname: string,
- *   query: string,
+ *   query: Object.<string, any>,
  *   asPath: string,
  *   req: Object.<string, any>,
  *   res: Object.<string, any>,
@@ -33,7 +33,7 @@ export const logout = ({ routeTo = '/login', shouldRedirect = true } = {}) => {
 export const authenticate = ctx => {
   const { token } = nextCookie(ctx);
 
-  if (!token || !isTokenValid) {
+  if (!token || !hasValidAuthToken(token)) {
     isomorphicRedirect('/login', ctx);
     return '';
   }
@@ -49,7 +49,7 @@ export const authenticate = ctx => {
  * @param {string} path
  * @param {{
  *   pathname: string,
- *   query: string,
+ *   query: Object.<string, any>,
  *   asPath: string,
  *   req: Object.<string, any>,
  *   res: Object.<string, any>,

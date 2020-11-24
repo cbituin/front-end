@@ -1,0 +1,62 @@
+.CodeSchools .intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.CodeSchools .intro .termDefinition {
+  margin: 1rem 2rem;
+  max-width: 500px;
+}
+
+.CodeSchools .filterContainer {
+  margin: 2rem 0;
+  width: 100%;
+}
+
+.CodeSchools .filterContainer > h5 {
+  text-align: center;
+}
+
+.CodeSchools .select {
+  margin: 0.5rem auto;
+  min-width: 20rem;
+  width: 90%;
+  max-width: 50rem;
+}
+
+.CodeSchools .schoolCardsWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.CodeSchools .centered {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.CodeSchools .schoolLocationModal {
+  width: 500px;
+}
+
+@media screen and (--small-viewport) {
+  .CodeSchools .schoolLocationModal {
+    width: 100%;
+  }
+}
+
+.CodeSchools .schoolLocationModal > div {
+  width: 100%;
+}
+
+.CodeSchools .schoolLocalModalItem {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--gray);
+}
+
+.CodeSchools .schoolLocalModalItem:last-child {
+  border-bottom: 0;
+  margin-bottom: 15px;
+}

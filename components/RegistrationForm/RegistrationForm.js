@@ -1,79 +1,80 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { func, number, oneOfType, shape, string } from 'prop-types';
 import { Formik, Field } from 'formik';
 import * as Yup from 'yup';
 import { createUser } from 'common/constants/api';
 import { getServerErrorMessage } from 'common/utils/api-utils';
 import { validationErrorMessages } from 'common/constants/messages';
-import { minimumPasswordLength } from 'common/constants/validations';
 import { capitalizeFirstLetter } from 'common/utils/string-utils';
-import { isMinPasswordStrength, isValidZipcode } from 'common/utils/validator-utils';
-import Button from 'components/Button/Button';
+import { minimumPasswordLength } from 'common/constants/validations';
+import { hasRequiredCharacters } from 'common/utils/validator-utils';
+import Button from 'components/Buttons/Button/Button';
 import Form from 'components/Form/Form';
 import Input from 'components/Form/Input/Input';
 import Alert from 'components/Alert/Alert';
-import styles from './RegistrationForm.css';
+import styles from './RegistrationForm.module.css';
 
+/**
+ * Zipcode issues solved via a trim check from Yup.
+ *
+ * This may seem counter-intuitive, but it's difficult to get a zipcode regex correctly.
+ * See https://stackoverflow.com/questions/578406/what-is-the-ultimate-postal-code-and-zip-regex
+ * for more info
+ *
+ */
 const registrationSchema = Yup.object().shape({
   email: Yup.string()
     .required(validationErrorMessages.required)
     .email(validationErrorMessages.email),
   'confirm-email': Yup.string()
     .required(validationErrorMessages.required)
-    .oneOf([Yup.ref('email')], validationErrorMessages.emailMatch),
+    .oneOf([Yup.ref('email')], validationErrorMessages.emailsMatch),
   password: Yup.string()
     .required(validationErrorMessages.required)
-    .min(minimumPasswordLength, validationErrorMessages.length(minimumPasswordLength))
-    .test('password-strength', validationErrorMessages.password, isMinPasswordStrength),
+    .min(minimumPasswordLength, validationErrorMessages.password)
+    .test('password-strength', validationErrorMessages.password, hasRequiredCharacters),
   'confirm-password': Yup.string()
     .required(validationErrorMessages.required)
-    .oneOf([Yup.ref('password')], validationErrorMessages.passwordMatch),
-  firstName: Yup.string().required(validationErrorMessages.required),
-  lastName: Yup.string().required(validationErrorMessages.required),
-  zipcode: Yup.string()
-    .required(validationErrorMessages.required)
-    .test('zipcode', validationErrorMessages.zipcode, isValidZipcode),
+    .oneOf([Yup.ref('password')], validationErrorMessages.passwordsMatch),
+  firstName: Yup.string().trim().required(validationErrorMessages.required),
+  lastName: Yup.string().trim().required(validationErrorMessages.required),
+  zipcode: Yup.string().trim().required(validationErrorMessages.required),
 });
 
-class RegistrationForm extends Component {
-  static propTypes = {
-    onSuccess: func.isRequired,
-    initialValues: shape({
-      email: string,
-      'confirm-email': string,
-      password: string,
-      'confirm-password': string,
-      firstName: string,
-      lastName: string,
-      zipcode: oneOfType([string, number]),
-    }),
-  };
+RegistrationForm.propTypes = {
+  onSuccess: func.isRequired,
+  initialValues: shape({
+    email: string,
+    'confirm-email': string,
+    password: string,
+    'confirm-password': string,
+    firstName: string,
+    lastName: string,
+    zipcode: oneOfType([string, number]),
+  }),
+};
 
-  static defaultProps = {
-    initialValues: {
-      email: '',
-      'confirm-email': '',
-      password: '',
-      'confirm-password': '',
-      firstName: '',
-      lastName: '',
-      zipcode: '',
-    },
-  };
+RegistrationForm.defaultProps = {
+  initialValues: {
+    email: '',
+    'confirm-email': '',
+    password: '',
+    'confirm-password': '',
+    firstName: '',
+    lastName: '',
+    zipcode: '',
+  },
+};
 
-  state = {
-    errorMessage: '',
-  };
+function RegistrationForm({ initialValues, onSuccess }) {
+  const [errorMessage, setErrorMessage] = useState('');
 
-  handleSubmit = async (values, actions) => {
-    const { onSuccess } = this.props;
-
+  const handleSubmit = async (values, actions) => {
     try {
       const { token } = await createUser(values);
+      await onSuccess({ user: values, token });
       actions.setSubmitting(false);
       actions.resetForm();
-
-      await onSuccess({ user: values, token });
     } catch (error) {
       actions.setSubmitting(false);
 
@@ -81,125 +82,119 @@ class RegistrationForm extends Component {
       if (data) {
         // TODO: Create back-end ticket for checking if email has been taken for a debounced,
         // client-side validation of emails instead of waiting for submission.
-        const errorMessage = Object.keys(data)
+        const newErrorMessage = Object.keys(data)
           .map(key => {
             const fieldName = capitalizeFirstLetter(key);
 
             // example: Email has already been taken.
-            return `${fieldName} ${data[key][0]}.`;
+            return `${fieldName}: ${data[key][0]}.`;
           })
           .join('\n');
 
-        this.setState({ errorMessage });
+        setErrorMessage(newErrorMessage);
       } else {
-        this.setState({ errorMessage: getServerErrorMessage(error) });
+        setErrorMessage(getServerErrorMessage(error));
       }
     }
   };
 
-  render() {
-    const { props, state } = this;
+  return (
+    <Formik
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+      validationSchema={registrationSchema}
+    >
+      {({ isSubmitting }) => (
+        <Form className={styles.RegistrationForm}>
+          <p>
+            We work closely with military veterans, service members, and spouses who are passionate
+            about transitioning into the tech industry. We work with over 7,000 members who are all
+            working towards relevant goals on Slack and in-person meet-ups. Membership is free!
+          </p>
 
-    return (
-      <Formik
-        initialValues={props.initialValues}
-        onSubmit={this.handleSubmit}
-        validationSchema={registrationSchema}
-      >
-        {({ isSubmitting }) => (
-          <Form className={styles.RegistrationForm}>
-            <div className={styles.row}>
-              <Field
-                type="email"
-                name="email"
-                label="Email*"
-                component={Input}
-                disabled={isSubmitting}
-                autoComplete="username email"
-              />
+          <div>
+            <Field
+              type="email"
+              name="email"
+              label="Email*"
+              component={Input}
+              disabled={isSubmitting}
+              autoComplete="username email"
+            />
 
-              <Field
-                type="email"
-                name="confirm-email"
-                label="Confirm Email*"
-                component={Input}
-                disabled={isSubmitting}
-                autoComplete="username email"
-              />
-            </div>
+            <Field
+              type="email"
+              name="confirm-email"
+              label="Confirm Email*"
+              component={Input}
+              disabled={isSubmitting}
+              autoComplete="username email"
+            />
 
-            <div className={styles.row}>
-              <Field
-                type="password"
-                name="password"
-                label="Password*"
-                component={Input}
-                disabled={isSubmitting}
-                autoComplete="new-password"
-              />
+            <Field
+              type="password"
+              name="password"
+              label="Password*"
+              component={Input}
+              disabled={isSubmitting}
+              autoComplete="new-password"
+            />
 
-              <Field
-                type="password"
-                name="confirm-password"
-                label="Confirm Password*"
-                component={Input}
-                disabled={isSubmitting}
-                autoComplete="new-password"
-              />
-            </div>
+            <Field
+              type="password"
+              name="confirm-password"
+              label="Confirm Password*"
+              component={Input}
+              disabled={isSubmitting}
+              autoComplete="new-password"
+            />
 
-            <div className={styles.row}>
-              <Field
-                type="text"
-                name="firstName"
-                label="First Name*"
-                component={Input}
-                disabled={isSubmitting}
-                autoComplete="given-name"
-              />
+            <Field
+              type="text"
+              name="firstName"
+              label="First Name*"
+              component={Input}
+              disabled={isSubmitting}
+              autoComplete="given-name"
+            />
 
-              <Field
-                type="text"
-                name="lastName"
-                label="Last Name*"
-                component={Input}
-                disabled={isSubmitting}
-                autoComplete="family-name"
-              />
-            </div>
+            <Field
+              type="text"
+              name="lastName"
+              label="Last Name*"
+              component={Input}
+              disabled={isSubmitting}
+              autoComplete="family-name"
+            />
 
-            <div className={styles.row}>
-              <Field
-                type="text"
-                name="zipcode"
-                label="Zipcode*"
-                component={Input}
-                disabled={isSubmitting}
-                autoComplete="postal-code"
-              />
-            </div>
+            <Field
+              type="text"
+              name="zipcode"
+              label="Zipcode*"
+              component={Input}
+              disabled={isSubmitting}
+              autoComplete="postal-code"
+            />
+          </div>
 
-            <div className={styles.row}>
-              <Alert isOpen={Boolean(state.errorMessage)} type="error">
-                {state.errorMessage}
-              </Alert>
-            </div>
+          {errorMessage && <Alert type="error">{errorMessage}</Alert>}
 
-            <div className={styles.row}>
-              <Button
-                className={styles.topMargin}
-                type="submit"
-                theme="secondary"
-                disabled={isSubmitting}
-              >
-                Submit
-              </Button>
-            </div>
-          </Form>
-        )}
-      </Formik>
-    );
-  }
+          <p>
+            The information we collect is to help us personalize your experience on our Slack
+            community. We do not sell your information to anyone.
+          </p>
+          <Button
+            className={styles.topMargin}
+            type="submit"
+            theme="secondary"
+            disabled={isSubmitting}
+          >
+            Submit
+          </Button>
+        </Form>
+      )}
+    </Formik>
+  );
 }
 
 export default RegistrationForm;

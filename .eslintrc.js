@@ -1,3 +1,6 @@
+/**
+ * @type {import("eslint").Linter.Config}
+ */
 module.exports = {
   extends: [
     'airbnb',
@@ -18,7 +21,7 @@ module.exports = {
   },
   parser: 'babel-eslint',
 
-  plugins: ['prettier', 'unicorn', 'jest', 'cypress'],
+  plugins: ['prettier', 'unicorn', 'jest', 'cypress', '@operation_code/custom-rules', 'import'],
 
   globals: {
     cy: true,
@@ -33,8 +36,12 @@ module.exports = {
       },
     },
     {
-      files: ['*.spec.js'],
+      files: ['cypress/**/*.js'],
       rules: {
+        'func-names': 'off',
+        'jest/expect-expect': 'off',
+        'jest/valid-expect': 'off',
+        'jest/valid-expect-in-promise': ['off'],
         'no-unused-expressions': ['off'],
       },
     },
@@ -56,11 +63,9 @@ module.exports = {
       },
     },
     {
-      files: ['cypress/**/*.js'],
+      files: ['components/UpdateProfileForm/**/*.js'],
       rules: {
-        'jest/expect-expect': 'off',
-        'jest/valid-expect': 'off',
-        'func-names': 'off',
+        'react/sort-comp': 'off',
       },
     },
   ],
@@ -91,6 +96,10 @@ module.exports = {
         groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
       },
     ],
+    'import/prefer-default-export': 'off',
+
+    // OC eslint Plugin Rules
+    '@operation_code/custom-rules/proptype-definition-above-fn': 'error',
 
     // Jest Plugin Rules
     'jest/consistent-test-it': [
@@ -118,10 +127,9 @@ module.exports = {
     'jest/prefer-strict-equal': 'error',
     'jest/prefer-to-be-null': 'error',
     'jest/prefer-to-be-undefined': 'error',
-    'jest/require-tothrow-message': 'error',
     'jest/valid-describe': 'error',
 
-    // JSX Plugin Rules
+    // JSX-A11Y Plugin Rules
     'jsx-a11y/anchor-is-valid': [
       'error',
       {
@@ -130,14 +138,12 @@ module.exports = {
         aspects: ['invalidHref', 'preferButton'],
       },
     ],
-    'jsx-a11y/label-has-for': [
+    'jsx-a11y/label-has-associated-control': [
       2,
       {
-        components: ['Label'],
-        required: {
-          some: ['for'],
-        },
-        allowChildren: true,
+        labelComponents: ['Label'],
+        labelAttributes: ['for'],
+        controlComponents: ['Input', 'Select'],
       },
     ],
 
@@ -173,9 +179,12 @@ module.exports = {
     ],
     'react/jsx-one-expression-per-line': 'off',
     'react/no-did-mount-set-state': 'off',
-    'react/no-unused-prop-types': 'off',
+    'react/no-unused-prop-types': 'error',
     'react/no-unused-state': 'error',
     'react/prefer-stateless-function': ['off'],
+    'react/static-property-placement': ['off'],
+    'react/jsx-props-no-spreading': ['off'],
+    'react/state-in-constructor': ['error', 'never'],
 
     // Unicorn Plugin Rules
     'unicorn/catch-error-name': 'error',
@@ -200,13 +209,20 @@ module.exports = {
           ctx: true,
           defaultProps: true,
           getInitialProps: true,
+          getStaticProps: true,
+          getStaticPaths: true,
+          getServerSideProps: true,
           initialProps: true,
           mapStateToProps: true,
+          mapDispatchToProps: true,
           propFullName: true,
           propValue: true,
           props: true,
           renderProps: true,
           requiredProps: true,
+          'custom-props': true,
+          'prop-utils': true,
+          'prop-utils.test': true,
         },
       },
     ],
@@ -221,12 +237,18 @@ module.exports = {
         ignoreUrls: true,
       },
     ],
-    'multiline-ternary': ['error', 'always-multiline'],
+    'multiline-ternary': 'off',
     'no-console': 'warn',
     'no-restricted-imports': [
       'error',
       {
         paths: [
+          {
+            name: 'lodash',
+            importNames: ['default'],
+            message: `Please add an import line for each method you want to use instead.\n
+             Example: import drop from 'lodash/drop';`,
+          },
           {
             name: 'react-select',
             message: 'Please use `components/Form/Select/ThemedReactSelect` instead.',
@@ -234,8 +256,8 @@ module.exports = {
           {
             name: 'prop-types',
             importNames: ['default'],
-            message:
-              "Please use non-default imports of `prop-types`. Example: `import { func } from 'prop-types';`",
+            message: `Please use named imports of "prop-types".\n
+              Example: "import { func } from 'prop-types';"`,
           },
         ],
       },

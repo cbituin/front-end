@@ -1,22 +1,29 @@
+import { networkErrorMessages } from '../../../common/constants/messages';
+import {
+  MULTI_STEP_STEP_BUTTON,
+  MULTI_STEP_PREVIOUS_BUTTON,
+  MULTI_STEP_SUBMIT_BUTTON,
+} from '../../../common/constants/testIDs';
+
 const goToNextStep = stepName => {
-  cy.get('button[data-testid="Submit Step Button"]').click();
+  cy.findByTestId(MULTI_STEP_STEP_BUTTON).click();
   cy.wait('@patchUser');
-  cy.get('h2').should('have.text', stepName);
+  cy.get('h3').should('have.text', stepName);
 };
 
 const goToPreviousStep = stepName => {
-  cy.get('button[data-testid="Previous Step Button"]').click();
-  cy.get('h2').should('have.text', stepName);
+  cy.findByTestId(MULTI_STEP_PREVIOUS_BUTTON).click();
+  cy.get('h3').should('have.text', stepName);
 };
 
 const firstStepName = 'Professional Details';
 const secondStepName = 'Military Status';
+const thirdStepName = 'Military Details';
 
 describe(`profile/update (unauthorized)`, () => {
   it(`should redirect to login if not authorized`, () => {
     // assert that route can't be reached without being authorized
     cy.visit('/profile/update');
-    cy.get('nav[data-testid="Desktop Nav"]').should('exist');
     cy.url().should('contain', '/login');
     cy.url().should('not.contain', '/profile/update');
     cy.get('h1').should('have.text', 'Login'); // redirect confirmed
@@ -31,7 +38,7 @@ describe(`profile/update (from login)`, () => {
 
     cy.visitAndWaitFor('/profile/update');
     cy.get('h1').should('have.text', 'Update Profile');
-    cy.get('h2').should('have.text', firstStepName);
+    cy.get('h3').should('have.text', firstStepName);
   });
 
   after(() => cy.clearCookies());
@@ -40,7 +47,7 @@ describe(`profile/update (from login)`, () => {
     goToNextStep(secondStepName);
     goToNextStep('Military Details');
     goToNextStep('Technology');
-    cy.get('button[data-testid="Submit Multi-Step Form"]').click();
+    cy.findByTestId(MULTI_STEP_SUBMIT_BUTTON).click();
     cy.wait('@patchUser');
     cy.url().should('contain', '/profile');
     cy.url().should('not.contain', '/profile/update');
@@ -78,9 +85,12 @@ describe(`profile/update (from login)`, () => {
 
     cy.clearCookies();
 
-    cy.get('button[data-testid="Submit Step Button"]').click();
-    cy.get('div[role="alert"]').should('have.text', 'Request failed with status code 401');
-    cy.get('h2').should('have.text', secondStepName);
+    cy.findByTestId(MULTI_STEP_STEP_BUTTON).click();
+    cy.get('div[role="alert"]').should(
+      'have.text',
+      'Authentication credentials were not provided.',
+    );
+    cy.get('h3').should('have.text', secondStepName);
   });
 
   it(`should not show military step if military status is non-military`, () => {
@@ -101,4 +111,72 @@ describe(`profile/update (from login)`, () => {
     // confirms that next step IS military details
     goToNextStep('Military Details');
   });
+
+  it(`should not allow negative in the years of service input`, () => {
+    goToNextStep(secondStepName);
+    goToNextStep(thirdStepName);
+
+    cy.get('input[name="yearsOfService"]').clear().type('-1');
+
+    cy.findByTestId(MULTI_STEP_STEP_BUTTON).click();
+
+    cy.get('div[role="alert"]').should('have.text', 'Enter a number between 1 and 40.');
+  });
+
+  it(`should not allow numbers greater than 40 in the years of service input`, () => {
+    goToNextStep(secondStepName);
+    goToNextStep(thirdStepName);
+
+    cy.get('input[name="yearsOfService"]').clear().type('41');
+
+    cy.findByTestId(MULTI_STEP_STEP_BUTTON).click();
+
+    cy.get('div[role="alert"]').should('have.text', 'Enter a number between 1 and 40.');
+  });
+});
+
+describe(`profile/update (from login) [server errors]`, () => {
+  beforeEach(() => {
+    cy.server({ method: 'PATCH', status: 500, response: {} });
+    cy.login();
+  });
+
+  after(() => cy.clearCookies());
+
+  it('should render an uncaught server error', () => {
+    const ErrorAPICall = 'PATCH_USER_FAIL_UNCAUGHT';
+
+    cy.route({ url: 'auth/profile/' }).as(ErrorAPICall);
+
+    cy.visitAndWaitFor('/profile/update');
+
+    cy.findByTestId(MULTI_STEP_STEP_BUTTON).click();
+    cy.wait(`@${ErrorAPICall}`);
+
+    cy.findByRole('alert').should('have.text', networkErrorMessages.serverDown);
+  });
+
+  // TODO: Get this working!
+  // @see https://github.com/cypress-io/cypress/issues/5840
+  // it('should render a caught server error', () => {
+  //   const ErrorAPICall = 'PATCH_USER_FAIL_CAUGHT';
+
+  //   const error = 'Fix this shit.';
+
+  //   cy.route({
+  //     method: 'PATCH',
+  //     url: 'auth/profile/',
+  //     status: 500,
+  //     response: {
+  //       data: {
+  //         error,
+  //       },
+  //     },
+  //   }).as(ErrorAPICall);
+
+  //   cy.findByTestId(SubmitButtonID).click();
+  //   cy.wait(`@${ErrorAPICall}`);
+
+  //   cy.findByRole('alert').should('have.text', error);
+  // });
 });

@@ -6,11 +6,6 @@ exports[`UpdateProfileForm/Steps/MilitaryDetails should render in context of For
   onReset={[Function]}
   onSubmit={[Function]}
 >
-  <h2
-    className="row"
-  >
-    Military Details
-  </h2>
   <div
     className="row"
   >
@@ -19,30 +14,33 @@ exports[`UpdateProfileForm/Steps/MilitaryDetails should render in context of For
     >
       <label
         className="Label"
+        data-testid="LABEL"
         htmlFor="branchOfService"
       >
         Branch Of Service*
       </label>
-      <div>
+      <div
+        className="selectFeedbackGrouping"
+      >
         <div
-          className="css-1pcexqc-container fullWidth"
+          className="fullWidth css-2b097c-container"
           onKeyDown={[Function]}
         >
           <div
-            className="css-1h6jeay-control"
+            className=" css-6k4gi9-control"
             onMouseDown={[Function]}
             onTouchEnd={[Function]}
           >
             <div
-              className="css-1hwfws3"
+              className=" css-g1d714-ValueContainer"
             >
               <div
-                className="css-151xaom-placeholder"
+                className=" css-1wa3eu0-placeholder"
               >
                 Select...
               </div>
               <div
-                className="css-1g6gooi"
+                className="css-b8ldur-Input"
               >
                 <div
                   className=""
@@ -100,20 +98,20 @@ exports[`UpdateProfileForm/Steps/MilitaryDetails should render in context of For
               </div>
             </div>
             <div
-              className="css-1wy0on6"
+              className=" css-1hb7zxy-IndicatorsContainer"
             >
               <span
-                className="css-bgvzuu-indicatorSeparator"
+                className=" css-1okebmr-indicatorSeparator"
               />
               <div
                 aria-hidden="true"
-                className="css-r2iad6-indicatorContainer"
+                className=" css-1vtn1ro-indicatorContainer"
                 onMouseDown={[Function]}
                 onTouchEnd={[Function]}
               >
                 <svg
                   aria-hidden="true"
-                  className="css-19bqh2r"
+                  className="css-6q0nyr-Svg"
                   focusable="false"
                   height={20}
                   viewBox="0 0 20 20"
@@ -134,26 +132,27 @@ exports[`UpdateProfileForm/Steps/MilitaryDetails should render in context of For
         </div>
       </div>
     </div>
-  </div>
-  <div
-    className="row"
-  >
     <div
       className="field"
+      data-testid="INPUT"
     >
       <label
         className="Label"
+        data-testid="LABEL"
         htmlFor="yearsOfService"
       >
         Years Of Service*
       </label>
       <div
         className="inputFeedbackGrouping"
+        data-testid="INPUT_FEEDBACK_GROUPING"
       >
         <input
           className="Input"
           disabled={false}
           id="yearsOfService"
+          max="40"
+          min="1"
           name="yearsOfService"
           onBlur={[Function]}
           onChange={[Function]}
@@ -164,15 +163,18 @@ exports[`UpdateProfileForm/Steps/MilitaryDetails should render in context of For
     </div>
     <div
       className="field"
+      data-testid="INPUT"
     >
       <label
         className="Label"
+        data-testid="LABEL"
         htmlFor="payGrade"
       >
         Pay Grade*
       </label>
       <div
         className="inputFeedbackGrouping"
+        data-testid="INPUT_FEEDBACK_GROUPING"
       >
         <input
           className="Input"

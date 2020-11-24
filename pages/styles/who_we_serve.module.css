@@ -1,0 +1,23 @@
+.WhoWeServe .justifyAlign {
+  text-align: justify;
+}
+
+.WhoWeServe .centeredText {
+  text-align: center;
+}
+
+.WhoWeServe .topMargin {
+  margin-top: 2.5rem;
+}
+
+.WhoWeServe .badgeGroupings {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: -1rem;
+}
+
+.WhoWeServe .badge {
+  fill: var(--secondary);
+  margin: 1rem 4rem;
+}

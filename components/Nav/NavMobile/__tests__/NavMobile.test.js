@@ -1,7 +1,8 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { fireEvent, render } from '@testing-library/react';
 import createShallowSnapshotTest from 'test-utils/createShallowSnapshotTest';
 import { mobileLoggedOutNavItems } from 'common/constants/navigation';
+import { CLOSE_BUTTON } from 'common/constants/testIDs';
 
 import NavMobile from '../NavMobile';
 
@@ -10,66 +11,68 @@ describe('NavMobile', () => {
     createShallowSnapshotTest(
       <NavMobile
         navItems={mobileLoggedOutNavItems}
-        isMenuVisible={false}
+        isOpen={false}
         openMenu={() => {}}
         closeMenu={() => {}}
       />,
     ));
 
-  it('should not have a visible menu when isMenuVisible prop is false', () => {
-    const wrapper = shallow(
+  it('should not have a visible menu when isOpen prop is false', () => {
+    const wrapper = render(
       <NavMobile
         navItems={mobileLoggedOutNavItems}
-        isMenuVisible={false}
+        isOpen={false}
         openMenu={() => {}}
         closeMenu={() => {}}
       />,
     );
 
-    expect(wrapper.find('ul')).not.toExist();
+    expect(wrapper.container.querySelector('ul')).toBeNull();
   });
 
-  it('should have a visible menu when isMenuVisible prop is true', () => {
-    const wrapper = shallow(
+  it('should have a visible menu when isOpen prop is true', () => {
+    const wrapper = render(
       <NavMobile
         navItems={mobileLoggedOutNavItems}
-        isMenuVisible
+        isOpen
         openMenu={() => {}}
         closeMenu={() => {}}
       />,
     );
 
-    expect(wrapper.find('ul')).toExist();
+    expect(wrapper.container.querySelector('ul')).not.toBeNull();
   });
 
   it('should invoke callback when hamburger button is clicked', () => {
     const mockOpen = jest.fn();
-    const wrapper = shallow(
+
+    const wrapper = render(
       <NavMobile
         navItems={mobileLoggedOutNavItems}
-        isMenuVisible={false}
+        isOpen={false}
         openMenu={mockOpen}
         closeMenu={() => {}}
       />,
     );
 
-    wrapper.find('.hamburger').simulate('click');
+    fireEvent.click(wrapper.queryByTestId('Hamburger Button'));
 
     expect(mockOpen).toHaveBeenCalled();
   });
 
   it('should invoke callback when close button is pressed', () => {
     const mockClose = jest.fn();
-    const wrapper = shallow(
+
+    const wrapper = render(
       <NavMobile
         navItems={mobileLoggedOutNavItems}
-        isMenuVisible
+        isOpen
         openMenu={() => {}}
         closeMenu={mockClose}
       />,
     );
 
-    wrapper.find('CloseButton').simulate('click');
+    fireEvent.click(wrapper.queryByTestId(CLOSE_BUTTON));
 
     expect(mockClose).toHaveBeenCalled();
   });

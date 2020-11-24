@@ -1,67 +1,93 @@
-const withCSS = require('@zeit/next-css');
-const withSourceMaps = require('@zeit/next-source-maps')();
-const withBundleAnalyzer = require('@zeit/next-bundle-analyzer');
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+const withMDX = require('@next/mdx')({
+  extension: /\.mdx$/,
+});
 const svgoConfig = require('./common/config/svgo');
 
-const nextConfig = withCSS({
-  // For now.sh
-  // see: https://zeit.co/guides/deploying-nextjs-with-now/
+const nextConfig = withBundleAnalyzer({
+  // For Vercel
+  // see: https://vercel.com/guides/deploying-nextjs-with-vercel
   target: 'serverless',
 
-  // eslint-disable-next-line unicorn/prevent-abbreviations
-  env: {
-    SENTRY_DSN: process.env.SENTRY_DSN,
-    LOGROCKET_KEY: process.env.LOGROCKET_KEY,
+  experimental: {
+    productionBrowserSourceMaps: true,
+    scrollRestoration: true,
   },
 
-  // NextCSS Config
-  cssModules: true,
-  cssLoaderOptions: {
-    // No need for importLoaders: 1 as its set to 1 when postcss.config.js exists
-    localIdentName: '[name]_[local]__[hash:base64:5]',
+  /** @see https://nextjs.org/docs/api-reference/next.config.js/rewrites */
+  async rewrites() {
+    return [
+      {
+        source: '/media',
+        destination: '/branding',
+      },
+      {
+        source: '/privacy',
+        destination: 'https://www.iubenda.com/privacy-policy/8174861',
+      },
+    ];
   },
 
-  // Bundle Analyzer Config (only used when running `yarn build:analyze`)
-  analyzeServer: process.env.ANALYZE,
-  analyzeBrowser: process.env.ANALYZE,
-  bundleAnalyzerConfig: {
-    server: {
-      analyzerMode: 'server',
-      analyzerPort: 8888,
-    },
-    browser: {
-      analyzerMode: 'server',
-      analyzerPort: 8889,
-    },
+  /** @see https://nextjs.org/docs/api-reference/next.config.js/redirects */
+  async redirects() {
+    return [
+      {
+        source: '/swag',
+        destination: 'https://operationcode.threadless.com/',
+        permanent: true,
+      },
+      {
+        source: '/store',
+        destination: 'https://operationcode.threadless.com/',
+        permanent: true,
+      },
+      {
+        source: '/shop',
+        destination: 'https://operationcode.threadless.com/',
+        permanent: true,
+      },
+    ];
   },
 
-  // eslint-disable-next-line unicorn/prevent-abbreviations
-  webpack: (config, { dev }) => {
+  /** @see https://nextjs.org/docs/api-reference/next.config.js/headers */
+  async headers() {
+    return [
+      {
+        source: '/_next/static/([^/]+/pages|chunks|runtime|css|fonts)/(.+)',
+        headers: [
+          {
+            key: 'cache-control',
+            value: 'max-age=31536000',
+          },
+        ],
+      },
+      {
+        source: '/(favicon.ico|robots.txt|manifest.json|humans.txt|sitemap.xml|sitemap.xsl)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, must-revalidate',
+          },
+        ],
+      },
+    ];
+  },
+
+  webpack: config => {
     // Fixes npm packages that depend on `fs` module
     // eslint-disable-next-line no-param-reassign
     config.node = { fs: 'empty' };
-
-    if (dev) {
-      // eslint-disable-next-line global-require
-      const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
-
-      // Filters Mini CSS Extract Plugin bug
-      // https://github.com/webpack-contrib/mini-css-extract-plugin/issues/250#issuecomment-415345126
-      config.plugins.push(
-        new FilterWarningsPlugin({
-          exclude: /mini-css-extract-plugin[^]*Conflicting order between:/,
-        }),
-      );
-    }
 
     config.module.rules.push(
       {
         test: /\.svg$/,
         use: [
           {
-            loader: 'react-svg-loader',
+            loader: '@svgr/webpack',
             options: {
-              svgo: svgoConfig,
+              svgoConfig,
             },
           },
         ],
@@ -75,7 +101,10 @@ const nextConfig = withCSS({
               limit: 8192,
               fallback: {
                 loader: 'file-loader',
-                options: { publicPath: '/_next/static/images', outputPath: 'static/images' },
+                options: {
+                  publicPath: '/_next/static/images',
+                  outputPath: 'static/images',
+                },
               },
               publicPath: '/_next/',
               outputPath: 'static/images/',
@@ -86,8 +115,22 @@ const nextConfig = withCSS({
       },
     );
 
+    // Add polyfills
+    const originalEntry = config.entry;
+
+    // eslint-disable-next-line no-param-reassign
+    config.entry = async () => {
+      const entries = await originalEntry();
+
+      if (entries['main.js'] && !entries['main.js'].includes('./polyfills.js')) {
+        entries['main.js'].unshift('./polyfills.js');
+      }
+
+      return entries;
+    };
+
     return config;
   },
 });
 
-module.exports = withSourceMaps(withBundleAnalyzer(nextConfig));
+module.exports = withMDX(nextConfig);

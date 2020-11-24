@@ -5,26 +5,35 @@ exports[`Footer should render with no props passed 1`] = `
   className="Footer"
 >
   <div
-    className="footerWrapper row"
+    className="footerGrouping socialGrouping"
   >
     <div
-      className="footerGrouping socialGrouping"
+      className="logoGrouping"
     >
-      <div
-        className="logoGrouping"
+      <Link
+        href="/"
       >
-        <img
-          alt="Operation Code Logo"
-          src="https://s3.amazonaws.com/operationcode-assets/branding/logos/small-blue-logo.png"
-        />
-      </div>
-      <div
-        className="capitalize marginBottom"
-      >
-        Connect With Us!
-      </div>
-      <SocialMedia />
+        <a
+          className="logoLink link"
+        >
+          <img
+            alt="Operation Code Logo"
+            className="logo"
+            src="https://operation-code-assets.s3.us-east-2.amazonaws.com/branding/logos/small-blue-logo.png"
+          />
+        </a>
+      </Link>
     </div>
+    <div
+      className="capitalize marginBottom"
+    >
+      Connect With Us!
+    </div>
+    <SocialMedia />
+  </div>
+  <div
+    className="footerWrapper row"
+  >
     <div
       className="footerGrouping linksGrouping capitalize"
     >
@@ -120,6 +129,15 @@ exports[`Footer should render with no props passed 1`] = `
           </li>
           <li>
             <Link
+              href="/podcast"
+            >
+              <a>
+                Podcast
+              </a>
+            </Link>
+          </li>
+          <li>
+            <Link
               href="/history"
             >
               <a>
@@ -128,13 +146,13 @@ exports[`Footer should render with no props passed 1`] = `
             </Link>
           </li>
           <li>
-            <OutboundLink
-              analyticsEventLabel="Donate footer link"
-              hasIcon={false}
-              href="https://secure.lglforms.com/form_engine/s/BRtP7QUKyHOyEYsZROsRew"
+            <Link
+              href="/donate"
             >
-              Donate
-            </OutboundLink>
+              <a>
+                Donate
+              </a>
+            </Link>
           </li>
         </ul>
         <ul
@@ -177,8 +195,8 @@ exports[`Footer should render with no props passed 1`] = `
     <div
       className="row copyright"
     >
-      Copyright 
-      2019
+      © 2014-
+      2020
        Operation Code™
     </div>
     <div

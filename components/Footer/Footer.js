@@ -5,7 +5,7 @@ import OutboundLink from 'components/OutboundLink/OutboundLink';
 import SocialMedia from 'components/SocialMedia/SocialMedia';
 import { footerItems } from 'common/constants/navigation';
 import { s3 } from 'common/constants/urls';
-import styles from './Footer.css';
+import styles from './Footer.module.css';
 
 function Footer() {
   const currentYear = new Date().getFullYear();
@@ -19,6 +19,7 @@ function Footer() {
             {name}
           </OutboundLink>
         ) : (
+          // TODO: Attack prefetch to scroll listener
           <Link href={href}>
             <a>{name}</a>
           </Link>
@@ -29,15 +30,22 @@ function Footer() {
 
   return (
     <footer className={styles.Footer}>
-      <div className={classNames(styles.footerWrapper, styles.row)}>
-        <div className={classNames(styles.footerGrouping, styles.socialGrouping)}>
-          <div className={classNames(styles.logoGrouping)}>
-            <img src={`${s3}branding/logos/small-blue-logo.png`} alt="Operation Code Logo" />
-          </div>
-          <div className={classNames(styles.capitalize, styles.marginBottom)}>Connect With Us!</div>
-          <SocialMedia />
+      <div className={classNames(styles.footerGrouping, styles.socialGrouping)}>
+        <div className={classNames(styles.logoGrouping)}>
+          <Link href="/" key="Home">
+            <a className={classNames(styles.logoLink, styles.link)}>
+              <img
+                src={`${s3}branding/logos/small-blue-logo.png`}
+                alt="Operation Code Logo"
+                className={styles.logo}
+              />
+            </a>
+          </Link>
         </div>
-
+        <div className={classNames(styles.capitalize, styles.marginBottom)}>Connect With Us!</div>
+        <SocialMedia />
+      </div>
+      <div className={classNames(styles.footerWrapper, styles.row)}>
         <div className={classNames(styles.footerGrouping, styles.linksGrouping, styles.capitalize)}>
           <div className={styles.linksRow}>
             <ul className={styles.linksColumn}>
@@ -61,7 +69,7 @@ function Footer() {
 
       <div className={classNames(styles.row, styles.legalGrouping)}>
         <div className={classNames(styles.row, styles.copyright)}>
-          Copyright {currentYear} Operation Code™
+          &#169; 2014-{currentYear} Operation Code™
         </div>
         <div className={classNames(styles.row, styles.legalLinks)}>
           {footerItems.legal.map(link =>

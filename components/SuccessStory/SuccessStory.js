@@ -1,6 +1,7 @@
 import React from 'react';
 import { string } from 'prop-types';
-import styles from './SuccessStory.css';
+import { Image } from '@innocuous/components';
+import styles from './SuccessStory.module.css';
 
 SuccessStory.propTypes = {
   imageSource: string.isRequired,
@@ -11,7 +12,7 @@ SuccessStory.propTypes = {
 function SuccessStory({ imageSource, quote, title }) {
   return (
     <div className={styles.SuccessStory}>
-      <img alt={`${title} headshot`} className={styles.image} src={imageSource} />
+      <Image alt={`${title} headshot`} className={styles.image} src={imageSource} />
       <div className={styles.quote}>
         <h6 className={styles.title}>{title}</h6>
         <blockquote>{`"${quote}"`}</blockquote>

@@ -14,7 +14,7 @@ exports[`SchoolCard should render with required props 1`] = `
     </h6>
   </ScreenReaderOnly>
   <div
-    className="giBillRibbon"
+    className="ribbon gi"
     data-testid="GI Bill Ribbon"
   >
     GI Bill
@@ -22,10 +22,62 @@ exports[`SchoolCard should render with required props 1`] = `
   <div
     className="cardBrand"
   >
-    <img
+    <Image
       alt="school name logo"
       height="150"
       src="source"
+    />
+  </div>
+  <div
+    className="cardBlock badgeGroup"
+  >
+    <Badge
+      className="badgeGroupItem active"
+      icon={<Svg />}
+      isImageFirst={true}
+      label={
+        <LabelWithScreenReader
+          isActive={true}
+          label="Physical campus"
+        />
+      }
+    />
+    <Badge
+      className="badgeGroupItem active"
+      icon={
+        <Svg
+          data-testid="School has online"
+        />
+      }
+      isImageFirst={true}
+      label={
+        <LabelWithScreenReader
+          isActive={true}
+          label="Online classes"
+        />
+      }
+    />
+    <Badge
+      className="badgeGroupItem active"
+      icon={<Svg />}
+      isImageFirst={true}
+      label={
+        <LabelWithScreenReader
+          isActive={true}
+          label="Housing options"
+        />
+      }
+    />
+    <Badge
+      className="badgeGroupItem active"
+      icon={<Svg />}
+      isImageFirst={true}
+      label={
+        <LabelWithScreenReader
+          isActive={true}
+          label="Provided equipment"
+        />
+      }
     />
   </div>
   <div
@@ -34,78 +86,7 @@ exports[`SchoolCard should render with required props 1`] = `
     <span
       className="cardBlockTitle"
     >
-      Availability
-    </span>
-    <div
-      className="badgeGroup"
-    >
-      <Badge
-        className="badgeGroupItem active"
-        icon={
-          <Svg
-            data-testid="School has online"
-          />
-        }
-        isImageFirst={true}
-        label={
-          <LabelWithScreenReader
-            isActive={true}
-            label="Online"
-          />
-        }
-      />
-      <Badge
-        className="badgeGroupItem active"
-        icon={<Svg />}
-        isImageFirst={true}
-        label={
-          <LabelWithScreenReader
-            isActive={true}
-            label="Campus"
-          />
-        }
-      />
-      <Badge
-        className="badgeGroupItem active"
-        icon={<Svg />}
-        isImageFirst={true}
-        label={
-          <LabelWithScreenReader
-            isActive={true}
-            label="Housing"
-          />
-        }
-      />
-      <Badge
-        className="badgeGroupItem active"
-        icon={<Svg />}
-        isImageFirst={true}
-        label={
-          <LabelWithScreenReader
-            isActive={true}
-            label="Equipment"
-          />
-        }
-      />
-    </div>
-  </div>
-  <div
-    className="cardBlock"
-  >
-    <span
-      className="cardBlockTitle"
-    >
-      Accepts GI Bill
-    </span>
-    Yes
-  </div>
-  <div
-    className="cardBlock"
-  >
-    <span
-      className="cardBlockTitle"
-    >
-      Campus Locations
+      Campus Locations:
     </span>
     Multiple locations
     <Button
@@ -133,10 +114,8 @@ exports[`SchoolCard should render with required props 1`] = `
   >
     <LinkButton
       analyticsEventLabel="school name | Website"
-      disabled={false}
       fullWidth={true}
       href="website"
-      shouldPrefetch={false}
       theme="secondary"
     >
       Visit Website

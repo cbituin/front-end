@@ -25,41 +25,34 @@ module.exports = {
     '<rootDir>/common/**/*.js',
     '<rootDir>/components/**/*.js',
     '<rootDir>/decorators/**/*.js',
-    '<rootDir>/store/**/*.js',
   ],
 
   // The directory where Jest should output its coverage files
-  coverageDirectory: '<rootDir>/coverage',
+  coverageDirectory: '<rootDir>/jest-coverage',
 
   // An array of regexp pattern strings used to skip coverage collection
   coveragePathIgnorePatterns: [
     '<rootDir>/node_modules',
+    '<rootDir>/cypress',
     '<rootDir>/common/config',
     '<rootDir>/common/styles',
     '<rootDir>/common/constants',
     '<rootDir>/scripts',
-    '<rootDir>/cypress',
     '<rootDir>/test-utils',
 
-    // No real logic to test here
+    // // No real logic to test here
     '<rootDir>/common/utils/api-utils.js',
-    '<rootDir>/components/FAQ/questions.js',
     '<rootDir>/components/ZipRecruiterJobs/ZipRecruiterJobs.js',
     '<rootDir>/components/Press/PressLinks/Articles.js',
-    '<rootDir>/store/store.js',
-    '<rootDir>/store/initialState.js',
-    '<rootDir>/store/(.*)/(types|actions).js',
+    '<rootDir>/components/Timeline/historyData.js',
 
-    // Don't collect coverage from import/export mappers
+    // // Don't collect coverage from import/export mappers
     '<rootDir>/common/(.*)/index.js',
     '<rootDir>/components/(.*)/index.js',
-
-    // Ignore Next.js files
-    '<rootDir>/components/head.js',
   ],
 
   // A list of reporter names that Jest uses when writing coverage reports
-  coverageReporters: ['lcov'],
+  coverageReporters: ['json', 'lcov'],
 
   // An object that configures minimum threshold enforcement for coverage results
   // coverageThreshold: null,
@@ -147,7 +140,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'], // eslint-disable-line unicorn/prevent-abbreviations
 
   // A list of paths to snapshot serializer modules Jest should use for snapshot testing
-  snapshotSerializers: ['enzyme-to-json/serializer'],
+  // snapshotSerializers: ['enzyme-to-json/serializer'],
 
   // The test environment that will be used for testing
   // testEnvironment: "jest-environment-jsdom",
@@ -194,7 +187,7 @@ module.exports = {
   // unmockedModulePathPatterns: undefined,
 
   // Indicates whether each individual test should be reported during the run
-  verbose: true,
+  // verbose: false,
 
   // An array of regexp patterns that are matched against all source file paths before re-running tests in watch mode
   // watchPathIgnorePatterns: [],

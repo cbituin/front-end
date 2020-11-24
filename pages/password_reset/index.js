@@ -5,39 +5,35 @@ import PasswordResetForm from 'components/PasswordResetForm/PasswordResetForm';
 import Alert from 'components/Alert/Alert';
 import { passwordReset } from 'common/constants/api';
 
-class PasswordReset extends React.Component {
-  state = {
-    didSubmitSuccessfully: false,
+const pageTitle = 'Reset Password';
+
+function PasswordReset() {
+  const [didSubmitSuccessfully, setDidSubmitSuccessfully] = React.useState(false);
+
+  const onSuccess = () => {
+    setDidSubmitSuccessfully(true);
   };
 
-  onSuccess = () => {
-    this.setState({ didSubmitSuccessfully: true });
-  };
+  return (
+    <>
+      <Head title={pageTitle} />
 
-  render() {
-    const { didSubmitSuccessfully } = this.state;
+      <HeroBanner title={pageTitle} />
 
-    return (
-      <>
-        <Head title="Reset Password" />
-
-        <HeroBanner title="Reset Password" />
-
-        <Content
-          theme="gray"
-          columns={[
-            didSubmitSuccessfully ? (
-              <Alert type="success">
-                A confirmation has been sent to the provided email address.
-              </Alert>
-            ) : (
-              <PasswordResetForm passwordReset={passwordReset} onSuccess={this.onSuccess} />
-            ),
-          ]}
-        />
-      </>
-    );
-  }
+      <Content
+        theme="gray"
+        columns={[
+          didSubmitSuccessfully ? (
+            <Alert type="success">
+              A confirmation has been sent to the provided email address.
+            </Alert>
+          ) : (
+            <PasswordResetForm passwordReset={passwordReset} onSuccess={onSuccess} />
+          ),
+        ]}
+      />
+    </>
+  );
 }
 
 export default PasswordReset;

@@ -6,11 +6,8 @@ exports[`NavListItem should render with required props passed 1`] = `
 >
   <Link
     href="/test"
-    prefetch={false}
   >
     <a
-      aria-expanded={false}
-      aria-haspopup={false}
       className="link navItemLink"
       data-testid="Nav Item Test"
       onMouseEnter={[Function]}

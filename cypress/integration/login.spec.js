@@ -1,7 +1,9 @@
+import jwt_decode from 'jwt-decode'; // eslint-disable-line camelcase
 import { networkErrorMessages } from '../../common/constants/messages';
 import existingUser from '../../test-utils/mocks/existingUser';
 import mockPassword from '../../test-utils/mockGenerators/mockPassword';
 import mockUser from '../../test-utils/mockGenerators/mockUser';
+import { PROFILE_GREETING } from '../../common/constants/testIDs';
 
 describe('login', () => {
   beforeEach(() => {
@@ -23,25 +25,25 @@ describe('login', () => {
 
     cy.url().should('contain', '/profile');
     cy.get('h1').should('have.text', 'Profile');
-    cy.get('p').contains('Hello Kyle Holmberg!');
+    cy.get(`[data-testid='${PROFILE_GREETING}']`).contains('Hello Kyle Holmberg!');
 
-    cy.getCookies().then(cookies => {
-      expect(cookies.some(({ value }) => value === existingUser.firstName)).to.be.true;
-      expect(cookies.some(({ value }) => value === existingUser.lastName)).to.be.true;
-      expect(cookies.some(({ value }) => value === existingUser.zipcode)).to.be.true;
+    cy.getCookies().then(([tokenCookie]) => {
+      const jwt = jwt_decode(tokenCookie.value);
+
+      expect(jwt.firstName).to.exist;
+      expect(jwt.lastName).to.exist;
+      expect(jwt.zipcode).to.exist;
     });
   });
 
   it('should NOT be able to login with valid, but non-existent credentials', () => {
-    const fakeUser = mockUser('nonexistinguser@someemail.com');
+    const fakeUser = mockUser({ desiredEmail: 'nonexistinguser@someemail.com' });
 
     cy.get('input#email').type(fakeUser.email);
     cy.get('input#password').type(fakeUser.password);
     cy.get('button[type="submit"]').click();
 
-    cy.wait('@postLogin')
-      .its('status')
-      .should('eq', 400);
+    cy.wait('@postLogin').its('status').should('eq', 400);
 
     cy.url().should('contain', '/login');
     cy.get('div[role="alert"]').should(
@@ -59,9 +61,7 @@ describe('login', () => {
 
     cy.get('button[type="submit"]').click();
 
-    cy.wait('@postLogin')
-      .its('status')
-      .should('eq', 400);
+    cy.wait('@postLogin').its('status').should('eq', 400);
 
     cy.url().should('contain', '/login');
     cy.get('div[role="alert"]').should(
@@ -88,5 +88,37 @@ describe('login', () => {
     cy.url().should('contain', '/login');
     cy.get('div[role="alert"]').should('have.text', networkErrorMessages.serverDown);
     cy.getCookies().should('have.length', 0);
+  });
+});
+
+describe('login?loggedOut=True', () => {
+  beforeEach(() => {
+    cy.clearCookies();
+    cy.getCookies().should('have.length', 0);
+    cy.visit('/login?loggedOut=True');
+  });
+
+  it('should display logged out alert if routed via logout button', () => {
+    cy.get('div[role="alert"]').should('have.text', 'Logged out successfully.');
+  });
+
+  it('should should not display logged out alert after re-render', () => {
+    cy.get('div[role="alert"]').should('have.text', 'Logged out successfully.');
+
+    cy.reload();
+
+    cy.get('div[role="alert"]').should('not.exist');
+  });
+
+  it('should not display logged out alert after invalid login attempt', () => {
+    const fakeUser = mockUser({ desiredEmail: 'nonexistinguser@someemail.com' });
+
+    cy.get('div[role="alert"]').should('have.text', 'Logged out successfully.');
+
+    cy.get('input#email').type(fakeUser.email);
+    cy.get('input#password').type(fakeUser.password);
+    cy.get('button[type="submit"]').click();
+
+    cy.get('div[role="alert"]').should('not.have.text', 'Logged out successfully.');
   });
 });

@@ -1,59 +1,68 @@
-import App, { Container } from 'next/app';
-import Router from 'next/router';
-import { Provider } from 'react-redux';
-import { compose } from 'redux';
-import nextCookie from 'next-cookies';
-import ScrollUpButton from 'react-scroll-up-button';
-import withRedux from 'next-redux-wrapper';
-import ReactGA from 'react-ga';
-import LogRocket from 'logrocket';
-import setupLogRocketReact from 'logrocket-react';
+/* eslint-disable max-classes-per-file */
 import * as Sentry from '@sentry/browser';
-import debounce from 'lodash/debounce';
-import { initStore } from 'store/store';
-import { screenResize } from 'store/screenSize/actions';
-import { setLoggedIn } from 'store/loggedIn/actions';
-import breakpoints from 'common/styles/breakpoints';
-import { isTokenValid } from 'common/utils/cookie-utils';
+import App from 'next/app';
+import Fingerprint2 from 'fingerprintjs2';
+import FontFaceObserver from 'fontfaceobserver';
+import hash from 'object-hash';
+import LogRocket from 'logrocket';
+import PropTypes from 'prop-types';
+import Router from 'next/router';
+import ScrollUpButton from 'react-scroll-up-button';
+import setupLogRocketReact from 'logrocket-react';
+import { clientTokens } from 'common/config/environment';
+import { gtag } from 'common/utils/thirdParty/gtag';
 import Nav from 'components/Nav/Nav';
 import Footer from 'components/Footer/Footer';
 import Modal from 'components/Modal/Modal';
-import withFonts from 'decorators/withFonts/withFonts';
+import { version } from '../package.json';
 import 'common/styles/globalStyles.css';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-// eslint-disable-next-line react/prefer-stateless-function
-class Layout extends React.Component {
-  render() {
-    // eslint-disable-next-line react/prop-types
-    const { children } = this.props;
+const fonts = [
+  {
+    fontFamily: 'Encode Sans',
+    url: 'https://fonts.googleapis.com/css?family=Encode+Sans:400,700',
+  },
+  {
+    fontFamily: 'DIN Condensed Bold',
+    // loading of this font is being handled by the @font-face rule on
+    // the global style sheet.
+    url: null,
+  },
+];
 
-    return (
-      <>
-        <Nav />
-        <main>{children}</main>
-        <Footer />
-        <ScrollUpButton />
-      </>
-    );
-  }
+Layout.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+function Layout({ children }) {
+  return (
+    <>
+      <Nav />
+      <main>{children}</main>
+      <Footer />
+      <ScrollUpButton />
+    </>
+  );
 }
+
+// Same test used by EFF for identifying users
+// https://panopticlick.eff.org/
+const setLogRocketFingerprint = () => {
+  Fingerprint2.get(components => {
+    const fingerprint = hash(components);
+    LogRocket.identify(fingerprint);
+  });
+};
 
 class OperationCodeApp extends App {
   componentDidMount() {
-    // get initial logged-in state on load
-    if (this.props.isLoggedIn) {
-      this.dispatchLogin();
-    }
-
-    this.handleScreenResize(); // get initial size on load
-    window.addEventListener('resize', this.debouncedHandleScreenResize);
-
-    if (isProduction) {
-      Sentry.init({ dsn: process.env.SENTRY_DSN });
-      LogRocket.init(`${process.env.LOGROCKET_KEY}/operation-code`);
-      ReactGA.initialize(process.env.GOOGLE_ANALYTICS_TRACKING_ID);
+    /* Analytics */
+    // TODO: Leverage prod-build-time-only env vars instead of window check
+    if (isProduction && window.location.host.includes('operationcode.org')) {
+      Sentry.init({ dsn: clientTokens.SENTRY_DSN, release: `front-end@${version}` });
+      LogRocket.init(`${clientTokens.LOGROCKET}/operation-code`);
 
       // Every crash report will have a LogRocket session URL.
       LogRocket.getSessionURL(sessionURL => {
@@ -64,9 +73,36 @@ class OperationCodeApp extends App {
 
       setupLogRocketReact(LogRocket);
 
-      ReactGA.set({ page: window.location.pathname });
+      // Per library docs, Fingerprint2 should not run immediately
+      if (window.requestIdleCallback) {
+        requestIdleCallback(setLogRocketFingerprint);
+      } else {
+        setTimeout(setLogRocketFingerprint, 500);
+      }
     }
 
+    /* Non-render blocking font load */
+    const observers = fonts.map(font => {
+      if (font.url) {
+        const link = document.createElement('link');
+        link.href = font.url;
+        link.rel = 'stylesheet'; // eslint-disable-line unicorn/prevent-abbreviations
+        document.head.append(link);
+      }
+
+      const observer = new FontFaceObserver(font.fontFamily);
+      return observer.load(null, 10000); // increase the max timeout from default 3s to 10s
+    });
+
+    Promise.all(observers)
+      .then(() => {
+        document.documentElement.classList.add('fonts-loaded');
+      })
+      .catch(() =>
+        Sentry.captureException('FontFaceObserver took too long to resolve. Ignore this.'),
+      );
+
+    /* Modal anchor set */
     if (Modal.setAppElement) {
       Modal.setAppElement('body');
     }
@@ -74,21 +110,6 @@ class OperationCodeApp extends App {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.debouncedHandleScreenResize);
-  }
-
-  // eslint-disable-next-line unicorn/prevent-abbreviations
-  static async getInitialProps({ Component, ctx }) {
-    // eslint-disable-next-line unicorn/prevent-abbreviations
-    let pageProps = {};
-    const { token } = nextCookie(ctx);
-    const isLoggedIn = isTokenValid(token);
-
-    // if page hits an API, make it async
-    if (Component.getInitialProps) {
-      pageProps = await Component.getInitialProps({ ...ctx, isLoggedIn });
-    }
-
-    return { pageProps, isLoggedIn };
   }
 
   componentDidCatch(error, errorInfo) {
@@ -103,52 +124,31 @@ class OperationCodeApp extends App {
     super.componentDidCatch(error, errorInfo);
   }
 
-  handleScreenResize = () => {
-    const { store } = this.props;
-    store.dispatch(screenResize(window.innerWidth, window.innerHeight, breakpoints));
-  };
-
-  dispatchLogin = () => {
-    const { store } = this.props;
-    store.dispatch(setLoggedIn());
-  };
-
-  debouncedHandleScreenResize = debounce(this.handleScreenResize, 100, {
-    leading: true,
-    maxWait: 250,
-  });
-
   render() {
     // eslint-disable-next-line unicorn/prevent-abbreviations
-    const { Component, pageProps, store } = this.props;
+    const { Component, pageProps } = this.props;
 
     return (
-      <Container>
-        <Provider store={store}>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </Provider>
-      </Container>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
     );
   }
 }
 
-if (isProduction) {
-  Router.events.on('routeChangeComplete', url => ReactGA.pageview(url));
-}
+Router.events.on('routeChangeComplete', url => gtag.pageView(url));
 
-// Fixes Next CSS route change bug: https://github.com/zeit/next-plugins/issues/282
+// Fixes Next CSS route change bug: https://github.com/vercel/next-plugins/issues/282
 if (!isProduction) {
   Router.events.on('routeChangeComplete', () => {
-    const chunksSelector = 'link[href*="/_next/static/css/styles.chunk.css"]';
+    const path = '/_next/static/chunks/styles.chunk.module.css';
+    const chunksSelector = `link[href*="${path}"]:not([rel=preload])`;
     const chunksNodes = document.querySelectorAll(chunksSelector);
-    const timestamp = new Date().valueOf();
-    chunksNodes[0].href = `/_next/static/css/styles.chunk.css?v=${timestamp}`;
+    if (chunksNodes.length) {
+      const timestamp = new Date().valueOf();
+      chunksNodes[0].href = `${path}?ts=${timestamp}`;
+    }
   });
 }
 
-export default compose(
-  withFonts,
-  withRedux(initStore),
-)(OperationCodeApp);
+export default OperationCodeApp;

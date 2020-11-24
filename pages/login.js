@@ -1,10 +1,11 @@
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { func, bool } from 'prop-types';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { setLoggedIn, setLoggedOut } from 'store/loggedIn/actions';
+import { withRouter } from 'next/router';
+import { bool, shape, func } from 'prop-types';
+import nextCookie from 'next-cookies';
 import { loginUser, loginSocial } from 'common/constants/api';
 import { login, logout, isomorphicRedirect } from 'common/utils/auth-utils';
+import { hasValidAuthToken } from 'common/utils/cookie-utils';
 import Head from 'components/head';
 import Alert from 'components/Alert/Alert';
 import Content from 'components/Content/Content';
@@ -13,90 +14,100 @@ import HeroBanner from 'components/HeroBanner/HeroBanner';
 import SocialLoginButtons from 'components/SocialLoginGroup/SocialLoginButtons';
 import SocialLoginGroup from 'components/SocialLoginGroup/SocialLoginGroup';
 
-class Login extends React.Component {
-  static propTypes = {
-    dispatch: func.isRequired,
-    loggedOut: bool,
-  };
+const pageTitle = 'Login';
 
-  static defaultProps = {
-    loggedOut: false,
-  };
+Login.propTypes = {
+  // pulled out of query param
+  loggedOut: bool,
+  router: shape({
+    push: func.isRequired,
+  }).isRequired,
+};
 
-  static async getInitialProps({ query: { loggedOut }, ...ctx }) {
-    if (loggedOut) {
-      return { loggedOut: !!loggedOut };
-    }
+Login.defaultProps = {
+  loggedOut: false,
+};
 
-    // redirect to profile if already logged in
-    if (ctx.isLoggedIn) {
-      isomorphicRedirect('/profile', ctx);
-    }
-
-    return {};
+Login.getInitialProps = async ({ query: { loggedOut }, ...ctx }) => {
+  if (loggedOut) {
+    return { loggedOut: !!loggedOut };
   }
 
-  componentDidMount() {
-    const { dispatch, loggedOut } = this.props;
+  const { token } = nextCookie(ctx);
+  const isLoggedIn = hasValidAuthToken(token);
 
-    // initiate logout if user was routed
-    // here by clicking the logout link
+  // redirect to profile if already logged in
+  if (isLoggedIn) {
+    isomorphicRedirect('/profile', ctx);
+  }
+
+  return {};
+};
+
+function Login({ loggedOut, router }) {
+  const [alertMessage, setAlertMessage] = useState('');
+
+  useEffect(() => {
     if (loggedOut) {
+      router.push('/login', '/login', { shallow: true });
       logout({ shouldRedirect: false });
-      dispatch(setLoggedOut());
+      setAlertMessage('Logged out successfully.');
     }
-  }
+  }, [loggedOut]);
 
-  handleSuccess = ({ token, user }) => {
-    const { dispatch } = this.props;
-    dispatch(setLoggedIn());
-    login({ token, user });
+  const clearAlert = () => {
+    setAlertMessage('');
   };
 
-  render() {
-    const { loggedOut } = this.props;
-    return (
-      <>
-        <Head title="Login" />
+  const handleSuccess = ({ token }) => {
+    login({ token });
+  };
 
-        <HeroBanner title="Login" />
+  const onLogin = values => {
+    clearAlert();
+    return loginUser(values);
+  };
 
-        <Content
-          theme="gray"
-          columns={[
-            <>
-              {loggedOut && (
-                <Alert isOpen type="success">
-                  Logged out successfully.
-                </Alert>
-              )}
-            </>,
-            <LoginForm login={loginUser} onSuccess={this.handleSuccess} />,
-            <p>
-              Don&apos;t have an account?&nbsp;
-              <Link href="/join">
-                <a>Register</a>
-              </Link>
-              .
-            </p>,
+  const onLoginSocial = (provider, values) => {
+    clearAlert();
+    return loginSocial(provider, values);
+  };
 
-            <p>
-              Forgot your password?&nbsp;
-              <Link href="/password_reset">
-                <a>Reset it</a>
-              </Link>
-              .
-            </p>,
-            <SocialLoginGroup handleSuccess={this.handleSuccess} loginSocial={loginSocial}>
-              {({ onSuccess, onGoogleFailure }) => (
-                <SocialLoginButtons onSuccess={onSuccess} onGoogleFailure={onGoogleFailure} />
-              )}
-            </SocialLoginGroup>,
-          ]}
-        />
-      </>
-    );
-  }
+  return (
+    <>
+      <Head title={pageTitle} />
+
+      <HeroBanner title={pageTitle} />
+
+      <Content
+        theme="gray"
+        columns={[
+          <>{alertMessage && <Alert type="success">{alertMessage}</Alert>}</>,
+          <LoginForm login={onLogin} onSuccess={handleSuccess} />,
+          <p>
+            Don&apos;t have an account?&nbsp;
+            <Link href="/join">
+              <a>Register</a>
+            </Link>
+            .
+          </p>,
+
+          <p>
+            Forgot your password?&nbsp;
+            <Link href="/password_reset">
+              <a>Reset it</a>
+            </Link>
+            .
+          </p>,
+          <SocialLoginGroup handleSuccess={handleSuccess} loginSocial={onLoginSocial}>
+            {({ onSuccess, onGoogleFailure }) => (
+              <SocialLoginButtons onSuccess={onSuccess} onGoogleFailure={onGoogleFailure} />
+            )}
+          </SocialLoginGroup>,
+        ]}
+      />
+    </>
+  );
 }
 
-export default compose(connect())(Login);
+export default withRouter(Login);

@@ -1,0 +1,15 @@
+.Team .boardMembers {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.Team .boardMembers img {
+  object-fit: cover;
+}
+
+.Team .foundingMembers {
+  padding: 2rem 0 0 0;
+}

@@ -1,0 +1,27 @@
+.Contact .verticalSpacing {
+  margin: 1rem 0;
+}
+
+.Contact .justifyAlign {
+  text-align: justify;
+}
+
+.Contact .contactHero a {
+  transition: color 0.2s linear;
+}
+
+.Contact .contactHero a:focus,
+.Contact .contactHero a:hover {
+  text-shadow: none;
+  color: var(--primary);
+}
+
+.Contact .contactMethod {
+  margin: 0 auto 2rem;
+  max-width: 700px; /* keep in sync with paragraph max-width */
+  font-style: normal;
+}
+
+.Contact .forceWidth {
+  width: 100%;
+}

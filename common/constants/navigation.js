@@ -1,7 +1,11 @@
 import flattenDepth from 'lodash/flattenDepth';
-import { donateLink } from 'common/constants/urls';
 
 // MARK: Links shared between nav and footer (no duplicate code)
+const whoWeServeLink = {
+  name: 'Who We Serve',
+  href: '/who_we_serve',
+};
+
 const contactLink = {
   name: 'Contact Us',
   href: '/contact',
@@ -10,6 +14,11 @@ const contactLink = {
 const faqLink = {
   name: 'FAQ',
   href: '/faq',
+};
+
+const podcastLink = {
+  name: 'Podcast',
+  href: '/podcast',
 };
 
 const getInvolvedLink = {
@@ -23,14 +32,9 @@ const eventsLink = {
 };
 
 // MARK: Top-level navigation items
-const whoWeServeWithoutSublinks = {
-  name: 'Who We Serve',
-  href: '/who_we_serve',
-  shouldPrefetch: false,
-};
-
-const whoWeServeWithSublinks = {
-  ...whoWeServeWithoutSublinks,
+const accountWithSublinks = {
+  name: 'Account',
+  href: '/login',
   sublinks: [
     {
       name: 'Login',
@@ -41,23 +45,21 @@ const whoWeServeWithSublinks = {
       href: '/join',
     },
   ],
+  icon: 'UserLogo',
 };
 
 const aboutUs = {
   name: 'About Us',
   href: '/about',
-  shouldPrefetch: false,
-  sublinks: [contactLink, faqLink],
+  sublinks: [whoWeServeLink, contactLink, faqLink, podcastLink],
 };
 
 const events = {
   ...eventsLink,
-  shouldPrefetch: false,
 };
 
 const getInvolved = {
   ...getInvolvedLink,
-  shouldPrefetch: false,
   sublinks: [
     {
       name: 'Sponsorship',
@@ -70,27 +72,40 @@ const getInvolved = {
   ],
 };
 
+const profile = {
+  name: 'Profile',
+  href: '/profile',
+};
+
 const logout = {
   name: 'Logout',
   href: '/login?loggedOut=true',
-  shouldPrefetch: false,
 };
 
 // MARK: Nav items
-export const loggedInNavItems = [aboutUs, whoWeServeWithoutSublinks, events, getInvolved, logout];
-export const loggedOutNavItems = [aboutUs, whoWeServeWithSublinks, events, getInvolved];
+export const loggedInNavItems = [aboutUs, events, getInvolved, profile, logout];
+export const loggedOutNavItems = [aboutUs, events, getInvolved, accountWithSublinks];
 
 // Extracts sublinks to list everything as a single, top-level list
 export const mobileLoggedInNavItems = flattenDepth(
-  [logout, aboutUs, whoWeServeWithoutSublinks, events, getInvolved].map(
-    ({ sublinks = [], ...item }) => [item, sublinks],
-  ),
+  [
+    logout,
+    profile,
+    aboutUs,
+    whoWeServeLink,
+    events,
+    getInvolved,
+  ].map(({ sublinks = [], ...item }) => [item, sublinks]),
   2,
 );
 export const mobileLoggedOutNavItems = flattenDepth(
-  [...whoWeServeWithSublinks.sublinks, aboutUs, whoWeServeWithoutSublinks, events, getInvolved].map(
-    ({ sublinks = [], ...item }) => [item, sublinks],
-  ),
+  [
+    ...accountWithSublinks.sublinks,
+    aboutUs,
+    whoWeServeLink,
+    events,
+    getInvolved,
+  ].map(({ sublinks = [], ...item }) => [item, sublinks]),
   2,
 );
 
@@ -114,10 +129,7 @@ export const footerItems = {
       name: 'Job Board',
     },
     eventsLink,
-    {
-      href: '/who_we_serve',
-      name: 'Who We Serve',
-    },
+    whoWeServeLink,
   ],
   column3: [
     {
@@ -126,13 +138,16 @@ export const footerItems = {
     },
     getInvolvedLink,
     {
+      href: '/podcast',
+      name: 'Podcast',
+    },
+    {
       href: '/history',
       name: 'History',
     },
     {
-      href: donateLink,
+      href: '/donate',
       name: 'Donate',
-      analyticsEventLabel: 'Donate',
     },
   ],
   column4: [
@@ -154,14 +169,8 @@ export const footerItems = {
       href: '/terms',
       name: 'Terms of Use',
     },
-    // TODO: Create a link for this
-    // {
-    //   href: 'https://www.anotherfakeurl.com/',
-    //   name: 'Cookies',
-    //   analyticsEventLabel: 'Cookies',
-    // },
     {
-      // NOTE: If you change this route, please update the redirect in `now.json` as well
+      // NOTE: If you change this route, please update the redirect in `vercel.json` as well
       href: 'https://www.iubenda.com/privacy-policy/8174861',
       name: 'Privacy',
       analyticsEventLabel: 'Privacy',

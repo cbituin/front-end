@@ -1,62 +1,52 @@
 import Link from 'next/link';
-import { func, object } from 'prop-types';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { setLoggedIn } from 'store/loggedIn/actions';
+import { object } from 'prop-types';
 import { withRouter } from 'next/router';
 import { login } from 'common/utils/auth-utils';
+import { gtag } from 'common/utils/thirdParty/gtag';
 import Head from 'components/head';
 import HeroBanner from 'components/HeroBanner/HeroBanner';
 import Content from 'components/Content/Content';
 import RegistrationForm from 'components/RegistrationForm/RegistrationForm';
 
+const pageTitle = 'Join';
+
 const profileUpdateURL = '/profile/update';
 
-class Join extends React.Component {
-  static propTypes = {
-    dispatch: func.isRequired,
-    router: object.isRequired,
-  };
+Join.propTypes = {
+  router: object.isRequired,
+};
 
-  componentDidMount() {
-    const { router } = this.props;
-
+function Join({ router }) {
+  React.useEffect(() => {
     router.prefetch(profileUpdateURL);
-  }
+  }, []);
 
-  handleSuccess = ({ token, user }) => {
-    const { dispatch } = this.props;
-
-    login({ token, user }, profileUpdateURL);
-    dispatch(setLoggedIn());
+  const handleSuccess = ({ token }) => {
+    gtag.conversionEvent({ adId: '9ZvVCOOFmrkBEK-Rnp4D', category: 'sign_up' });
+    login({ token }, profileUpdateURL);
   };
 
-  render() {
-    return (
-      <>
-        <Head title="Join" />
+  return (
+    <>
+      <Head title={pageTitle} />
 
-        <HeroBanner title="Join" />
+      <HeroBanner title={pageTitle} />
 
-        <Content
-          theme="gray"
-          columns={[
-            <RegistrationForm onSuccess={this.handleSuccess} />,
-            <p>
-              Already registered?&nbsp;
-              <Link href="/login">
-                <a>Login</a>
-              </Link>
-              .
-            </p>,
-          ]}
-        />
-      </>
-    );
-  }
+      <Content
+        theme="gray"
+        columns={[
+          <RegistrationForm onSuccess={handleSuccess} />,
+          <p>
+            {'Already registered? '}
+            <Link href="/login">
+              <a>Login</a>
+            </Link>
+            .
+          </p>,
+        ]}
+      />
+    </>
+  );
 }
 
-export default compose(
-  connect(),
-  withRouter,
-)(Join);
+export default withRouter(Join);

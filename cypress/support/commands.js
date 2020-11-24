@@ -11,14 +11,15 @@
 //
 // -- This is a parent command --
 // Cypress.Commands.add("login", (email, password) => { ... })
+import '@testing-library/cypress/add-commands';
 import { addMatchImageSnapshotCommand } from 'cypress-image-snapshot/command';
 import existingUser from '../../test-utils/mocks/existingUser';
 import { apiUrl } from '../../common/config/environment';
-import { userInfoCookieNames } from '../../common/utils/cookie-utils';
 
 Cypress.Commands.add('visitAndWaitFor', path => {
   cy.visit(path);
-  cy.get('nav[data-testid="Desktop Nav"]').should('exist');
+  cy.findByTestId('Desktop Nav').should('exist');
+  cy.findByTestId('Desktop Nav').should('be.visible');
   cy.url().should('contain', path);
 });
 
@@ -30,9 +31,8 @@ Cypress.Commands.add('login', () => {
     body: {
       ...existingUser,
     },
-  }).then(({ body: { token, user } }) => {
+  }).then(({ body: { token } }) => {
     cy.setCookie('token', token);
-    userInfoCookieNames.forEach(cookieName => cy.setCookie(cookieName, `${user[cookieName]}`));
   });
 });
 
@@ -49,6 +49,12 @@ Cypress.Commands.add('setResolution', size => {
   } else {
     cy.viewport(size);
   }
+});
+
+Cypress.Commands.add('checkCustomDataAttribute', (attribute, value) => {
+  const attributeWithoutBrackets = attribute.replace(/[[\]]/g, '');
+
+  cy.get(attribute).invoke('attr', attributeWithoutBrackets).should('contain', value);
 });
 
 //

@@ -1,0 +1,28 @@
+.Podcast .podcastCards {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.Podcast .podcastCard {
+  align-items: center;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  overflow: hidden; /* prevent devs from bloating content */
+  margin: 1.5rem;
+  width: 500px;
+}
+
+@media screen and (--small-viewport) {
+  .Podcast .podcastCard {
+    width: 100%;
+  }
+}
+
+.Podcast .img {
+  max-height: 300px;
+  max-width: 100%;
+  object-fit: cover;
+}

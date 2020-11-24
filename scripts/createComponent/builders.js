@@ -4,29 +4,21 @@ module.exports = {
   // Output generated for component's definition file
   buildJS: componentName =>
     `import React from 'react';
-import { oneOfType, arrayOf, element, string, node } from 'prop-types';
+import { string, node } from 'prop-types';
 import classNames from 'classnames';
-import styles from './${componentName}.css';
+import styles from './${componentName}.module.css';
 
-export default class ${componentName} extends React.Component {
-  static propTypes = {
-    children: oneOfType([
-      arrayOf(node),
-      element,
-      string,
-    ]).isRequired,
-    className: string,
-  };
+${componentName}.propTypes = {
+  children: node.isRequired,
+  className: string,
+};
 
-  static defaultProps = {
-    className: undefined,
-  };
+${componentName}.defaultProps = {
+  className: undefined,
+};
 
-  render() {
-    const { props } = this;
-
-    return <div className={classNames(props.className, styles.${componentName})}>{props.children}</div>;
-  }
+export default function ${componentName}({ className, children }) {
+  return <div className={classNames(className, styles.${componentName})}>{children}</div>
 }
 `,
 
@@ -36,43 +28,38 @@ export default class ${componentName} extends React.Component {
   // Output generated for component's story file
   buildStoryJs: componentName =>
     `import React from 'react';
-import { storiesOf } from '@storybook/react';
-import { withInfo } from '@storybook/addon-info';
-import { withKnobs, text } from '@storybook/addon-knobs';
 
 import ${componentName} from '../${componentName}';
 
-storiesOf('${componentName}', module)
-  .addDecorator(withKnobs)
-  .add(
-    'default',
-    withInfo()(() => (
-      <${componentName}>
-        {text('children', 'string or .node')}
-      </${componentName}>
-    )),
-  );
+export default {
+  component: ${componentName},
+  title: '${componentName}',
+};
+
+const Template = (args) => <${componentName} {...args} />;
+
+export const Default = Template.bind({});
+
+/** Default ${componentName} supplied with only required args */
+Default.args = {
+  children: '',
+};
+
 `,
 
   // Output generated for component's test file
   buildTestJs: componentName =>
     `import React from 'react';
-import createSnapshotTest from 'test-utils/createSnapshotTest';
+import { render } from '@testing-library/react';
 
 import ${componentName} from '../${componentName}';
 
 describe('${componentName}', () => {
-  it('should render with required props', () => {
-    createSnapshotTest(<${componentName}>Test</${componentName}>);
-  });
+  it('should render', () => {
+    const { container } = render(<${componentName} />);
 
-  it('should render with many props assigned', () => {
-    createSnapshotTest(
-      <${componentName} className="test-class">
-        Test
-      </${componentName}>,
-    );
-  });
+    expect(container.firstChild).not.toBeNull();
+  })
 });
 `,
 };

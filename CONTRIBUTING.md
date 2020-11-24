@@ -4,7 +4,13 @@ Firstly, thank you for considering contributing to our project! It's people like
 
 The team at Operation Code wants to reiterate that joining our Slack team is the ultimate way to set yourself up for success when contributing to our repository (repo). You can get an invite to our Slack channel by [requesting to join Operation Code](https://operationcode.org/join). Once in our Slack team, simply type: `/open #oc-projects` and then click enter. Feel free to ask for help; everyone is a beginner at first :smile_cat:!
 
-**This guideline is for newer developers, developers who are unfamiliar with the quick start instructions, and developers who are unfamiliar with React. This guide assumes that you are a little bit familiar with HTML, CSS, and JavaScript.**
+## For Everybody
+
+**Regardless of your experience level**, reading about our [technology choices](#technologies) and our [development workflow](#development-workflow) will prove beneficial.
+
+## For Developers With Less Experience
+
+We're so excited your want to contribute! Most of this guideline is for newer developers, developers who are unfamiliar with the quick start instructions, and developers who are unfamiliar with React. This guide assumes that you are a little bit familiar with HTML, CSS, and JavaScript.
 
 Reading this entire guide not only helps you contribute successfully into our codebase, it also helps to communicate that you respect the time of the developers managing and developing this open source project. In return, they should reciprocate that respect in addressing your issue, assessing changes, and helping you finalize your pull requests.
 
@@ -54,13 +60,13 @@ There are many resources in the wild to learn about all forms of version control
 
 ### GitHub Workflow
 
-1. Before working on an issue, post a comment on the issue asking to claim it. One of our maintainers will assign themselves as a placeholder on the issue, at which point you are good to start working on it. We don't like competition in open source, nor do we enjoy closing pull requests resolving the same issue... Please only ask to claim unassigned issues!
-2. Once you've claimed an issue, feel free to [fork the repo](https://help.github.com/articles/fork-a-repo/).
+1. Before working on an issue, review the issue and post a comment to clarify if there has been any progress made.
+2. Once you've reviewed an issue, feel free to [fork the repo](https://help.github.com/articles/fork-a-repo/).
 3. If you follow all of the instructions in the help article above, you'll be able to create a branch. That's `git checkout -b YOUR_BRANCH_NAME` Note that some companies and organizations have branch-naming conventions - we do not.
 4. Once you make a branch, you're free to open your preferred text editor and code. If you don't have a preferred text editor, Operation Code recommends [Visual Studio Code](https://code.visualstudio.com/) (more commonly referred to as "VS Code" and not to be confused with Visual Studio). You'll want to follow along with [Development Workflow](#development-workflow) to see how you should go about coding in the repo.
 5. When your changes are complete, commit your changes. If you use `git commit` often, you'll notice your commit is taking longer than usual! That's because we have a "pre-commit hook". This hook is [linting](https://stackoverflow.com/questions/8503559/what-is-linting), formatting (example: changing tabs to spaces), and testing all of your changes. If a test fails, so does the commit. If your code had changes after formatting, you'll need to re-stage those file(s) and use `git commit --amend` to add the linted/formatted code to your original commit.
 6. After committing, push your branch to your forked repo. `git push -u origin YOUR_BRANCH_NAME` should do the trick.
-7. Create a pull request within two weeks of claiming the issue, [using that branch on your fork](https://help.github.com/articles/creating-a-pull-request-from-a-fork/). You are at risk of being unassigned from the issue otherwise. While we like reserving issues out for others, this is necessary to prevent bogarting.
+7. Create a pull request within two weeks of working on the issue, [using that branch on your fork](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
 
 ## Explanations
 
@@ -74,7 +80,7 @@ When you visit our website you're interacting with two systems, a front-end appl
 
 _Quick Note_: Our back-end API is not currently connected to this repo.
 
-The back-end is responsible for providing data for the front-end to display. This sometimes involves processing the data entered into the front-end, and running various jobs like inviting new users to Slack, or signing them up for our newsletter. Our back-end is written in Rails and it's source code can be viewed [here](https://github.com/OperationCode/operationcode_backend). It acts primarily as a "REST API".
+The back-end is responsible for providing data for the front-end to display. This sometimes involves processing the data entered into the front-end, and running various jobs like inviting new users to Slack, or signing them up for our newsletter. Our back-end is composed of multiple services written with Python using Django and Flask and it's source code can be viewed in [back-end](https://github.com/OperationCode/back-end) and [resources_api](https://github.com/OperationCode/resources_api). It acts primarily as a "REST API".
 
 > "back-end" is synonymous with server, server-side, and "models & controllers".
 
@@ -86,19 +92,19 @@ The back-end is responsible for providing data for the front-end to display. Thi
 
 ## Technologies
 
-Here is an list of technologies this project leverages:
+Here is an alphabetically-sorted list of technologies this project leverages:
 
 - [Babel](https://babeljs.io/) - JavaScript compiler to unify all the different versions of JS that may have been used or will be used in the future. [Here's a blog post from Scotch.io on why JavaScript utilizes "transpiling" with Babel](https://scotch.io/tutorials/javascript-transpilers-what-they-are-why-we-need-them).
 - [CSS Modules](https://github.com/css-modules/css-modules) - CSS Modules allow us to encapsulate CSS within components. Instead of HTML/CSS - our project structure is basically JSX/CSS.
+- [Cypress](https://cypress.io/) - Hand-picked resources [here](https://github.com/OperationCode/front-end/tree/main/cypress/README.md).
 - [Jest](https://jestjs.io/) - A JavaScript testing framework from Facebook. We use it for all of our unit and some of our integration/regression tests.
 - [Next.js](https://nextjs.org/) - Next is a framework for creating ["server-side rendered"](https://medium.freecodecamp.org/demystifying-reacts-server-side-render-de335d408fe4) React applications with a lot of performance and [search engine optimizations](https://searchengineland.com/guide/what-is-seo) out-of-the-box.
 - [Node.js](https://www.nodejs.org/) - Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine. React utilizes a tiny Node/Express server for it's development environment.
+- [PostCSS](#PostCSS) - Extensive documentation listed below...
 - [React.js](https://facebook.github.io/react/) - Facebook's popular JavaScript front-end framework.
-- [Storybook](https://storybook.js.org) - Storybook acts as a "component workbench" and source for component documentation. You can learn more about Storybook on your own [here](https://www.learnstorybook.com/). You can see our Storybook here: [![Storybook](https://github.com/storybooks/brand/blob/master/badge/badge-storybook.svg)](http://storybook.operationcode.org)
+- [Storybook](https://storybook.js.org) - Storybook acts as a "component workbench" and source for component documentation. You can learn more about Storybook on your own [here](https://www.learnstorybook.com/). You can see our Storybook here: [![Storybook](https://github.com/storybookjs/brand/blob/8d28584c89959d7075c237e9345955c895048977/badge/badge-storybook.svg)](http://storybook.operationcode.org)
 - [Webpack](https://webpack.js.org/) - The premier module bundler for JavaScript. Read [this article](https://survivejs.com/webpack/what-is-webpack/) for more information.
 - [Yarn](https://yarnpkg.com/) - Facebook's open source JavaScript package manager. It has very subtle differences from npm, but essentially does the same thing.
-- [PostCSS](#PostCSS) - Extensive documentation listed below...
-- [Cypress](https://cypress.io/) - Hand-picked resources [here](https://github.com/OperationCode/front-end/tree/master/cypress/README.md).
 
 ### PostCSS
 
@@ -176,7 +182,7 @@ Which will output the following when deployed:
 }
 ```
 
-- [PostCSS Export Custom Variables](https://github.com/jonathantneal/postcss-export-custom-variables): We use this plug-in simply to export our collection of CSS variables to [common/styles/themeMap.js](https://github.com/OperationCode/front-end/blob/master/common/styles/themeMap.js) so that they're leveragable within any JavaScript context.
+- [PostCSS Export Custom Variables](https://github.com/jonathantneal/postcss-export-custom-variables): We use this plug-in simply to export our collection of CSS variables to [common/styles/themeMap.js](https://github.com/OperationCode/front-end/blob/main/common/styles/themeMap.js) so that they're leveragable within any JavaScript context.
 
 - [PostCSS Import](https://github.com/postcss/postcss-import): This plug-in essentially tries to emulate the existing [CSS Import spec](https://developer.mozilla.org/en-US/docs/Web/CSS/@import) allowing for modularization and concatenation of CSS files.
 
@@ -184,13 +190,13 @@ Which will output the following when deployed:
 
 ### Installing Dependencies
 
-VERY IMPORTANT: Recommended versions of tools used within the repo are described [here](https://github.com/OperationCode/front-end#quick-start).
+VERY IMPORTANT: Required versions of tools used within the repo are described [here](https://github.com/OperationCode/front-end#quick-start). We do not use `npm`.
 
 _You can check to see your versions like so:_
 
 - Run `node -v`. You can download the latest LTS release of node at [nodejs.org](https://nodejs.org) or you can use [nvm](https://github.com/creationix/nvm) to be able to switch between node versions easily for many projects. If you use Windows, you will need to use [nvm-windows](https://github.com/coreybutler/nvm-windows) instead.
-- Run `npm -v`. If you do not have version 4 or greater, run `npm install -g npm`
-- Run `yarn --version`. If you do not have version 1.12.1 or greater, run `npm install --global yarn`.
+- Run `npm -v`. If you need to install or upgrade npm, run `npm install -g npm`
+- Run `yarn --version`. If you need to install yarn, run `npm install --global yarn`.
 - Once you have all the required tooling, you should be able to run `yarn` at the root level of your forked repo. You should see a bunch of emojis and progress bars - that is how you will know it is working!
 
 ### Run The Development Server
@@ -204,15 +210,15 @@ Now that you've installed your dependencies and your new branch in your fork, yo
 
 ### Returning To Work After A Break
 
-Some issues take awhile to code a solution for. It is very normal to take a large amount of time to turn in well-written work that resolves an issue! In the meantime, there could be many other people contributing to the code base. Since we use Git, you'll want to keep you project up-to-date with the `master` branch so there are no [merge conflicts](https://help.github.com/articles/about-merge-conflicts/) to resolve when you make your pull request.
+Some issues take awhile to code a solution for. It is very normal to take a large amount of time to turn in well-written work that resolves an issue! In the meantime, there could be many other people contributing to the code base. Since we use Git, you'll want to keep you project up-to-date with the `main` branch so there are no [merge conflicts](https://help.github.com/articles/about-merge-conflicts/) to resolve when you make your pull request.
 
-1. [Keep your fork in sync with Operation Code's master branch.](https://help.github.com/articles/syncing-a-fork/)
+1. [Keep your fork in sync with Operation Code's main branch.](https://help.github.com/articles/syncing-a-fork/)
 2. Run `yarn` to install any updated dependencies
 3. Run `yarn dev` to restart local development environment
 
 ### Knowing The Tools At Your Disposal
 
-You can see interactive documentation on all of our components via [![Storybook](https://github.com/storybooks/brand/blob/master/badge/badge-storybook.svg)](http://storybook.operationcode.org)
+You can see interactive documentation on all of our components via [![Storybook](https://github.com/storybookjs/brand/blob/8d28584c89959d7075c237e9345955c895048977/badge/badge-storybook.svg)](http://storybook.operationcode.org)
 
 ### File Structure
 
@@ -229,8 +235,11 @@ You can see interactive documentation on all of our components via [![Storybook]
 |   ├── head.js  # Next.js-specific component to handle a page's meta info (and the rest of it's <head> tag) dynamically
 |   └── nav.js
 |
+├── cypress
+|   └── * # Houses all e2e/integration tests and configuration of cypress.
+|
 ├── decorators
-|   └── * # All directories specify decorators that wrap components to add little bits of functionality.
+|   └── * # This is filled with higher-order components that wrap components to add little bits of functionality.
 |
 ├── pages
 |   ├── styles
@@ -294,10 +303,10 @@ yarn test
 # Update all snapshot tests
 yarn test -u OR yarn test:update-snaps
 
-# Only run tests for files changed from master branch
+# Only run tests for files changed from main branch
 yarn test:changes
 
-# Start a test runner for files changed from master branch
+# Start a test runner for files changed from main branch
 yarn test:changes:watch
 
 # Start a test runner for all tests
@@ -390,7 +399,7 @@ Thread model: posix
 - Paste the code below into a terminal window to install homebrew.
 
 ```
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/main/install)"
 ```
 
 #### Git
@@ -426,7 +435,7 @@ The other option is to install the nodejs package from the official website. Sim
 
 Install the LTS version [Node.js](https://nodejs.org/en/download/).
 
-Follow the steps found in the [Quick Start Guide](https://github.com/OperationCode/operationcode_frontend/blob/master/CONTRIBUTING.md#quick-start-guide)
+Follow the steps found in the [Quick Start Guide](https://github.com/OperationCode/operationcode_frontend/blob/main/CONTRIBUTING.md#quick-start-guide)
 
 If you have any errors, make sure Node, npm, and Yarn is in your environment path by typing `PATH` in CMDER.
 Look for any path like the ones listed below. `{USER}` is your username you used to login into the computer.
@@ -452,7 +461,7 @@ There are many ways and guides to install NodeJS on Windows. We recommend using 
 The resources below are from Microsoft.
 
 - [NodeJS On Windows Guidelines](https://github.com/Microsoft/nodejs-guidelines)
-- [Configuring your Windows development environment for NodeJS](https://github.com/Microsoft/nodejs-guidelines/blob/master/windows-environment.md#configuring-your-windows-development-environment)
+- [Configuring your Windows development environment for NodeJS](https://github.com/Microsoft/nodejs-guidelines/blob/main/windows-environment.md#configuring-your-windows-development-environment)
 
 One way to install NodeJS for windows is to simply download and execute the MSI Package from the official downloads page.
 

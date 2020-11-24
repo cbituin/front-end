@@ -7,11 +7,31 @@ exports[`UpdateProfileForm should render with required props 1`] = `
   onReset={[Function]}
   onSubmit={[Function]}
 >
-  <h2
-    className="row"
+  <h3
+    className="centerAligned"
   >
     Professional Details
-  </h2>
+  </h3>
+  <div
+    className="ProgressIndicator"
+  >
+    <label
+      htmlFor="steps-indicator"
+    >
+      0
+      /
+      3
+       Complete
+    </label>
+    <progress
+      id="steps-indicator"
+      max={3}
+      value={0}
+    >
+      0
+      %
+    </progress>
+  </div>
   <div
     className="row"
   >
@@ -20,30 +40,33 @@ exports[`UpdateProfileForm should render with required props 1`] = `
     >
       <label
         className="Label"
+        data-testid="LABEL"
         htmlFor="employmentStatus"
       >
         Employment Status*
       </label>
-      <div>
+      <div
+        className="selectFeedbackGrouping"
+      >
         <div
-          className="css-1pcexqc-container fullWidth"
+          className="fullWidth css-2b097c-container"
           onKeyDown={[Function]}
         >
           <div
-            className="css-1h6jeay-control"
+            className=" css-6k4gi9-control"
             onMouseDown={[Function]}
             onTouchEnd={[Function]}
           >
             <div
-              className="css-1hwfws3"
+              className=" css-g1d714-ValueContainer"
             >
               <div
-                className="css-151xaom-placeholder"
+                className=" css-1wa3eu0-placeholder"
               >
                 Select...
               </div>
               <div
-                className="css-1g6gooi"
+                className="css-b8ldur-Input"
               >
                 <div
                   className=""
@@ -101,20 +124,20 @@ exports[`UpdateProfileForm should render with required props 1`] = `
               </div>
             </div>
             <div
-              className="css-1wy0on6"
+              className=" css-1hb7zxy-IndicatorsContainer"
             >
               <span
-                className="css-bgvzuu-indicatorSeparator"
+                className=" css-1okebmr-indicatorSeparator"
               />
               <div
                 aria-hidden="true"
-                className="css-r2iad6-indicatorContainer"
+                className=" css-1vtn1ro-indicatorContainer"
                 onMouseDown={[Function]}
                 onTouchEnd={[Function]}
               >
                 <svg
                   aria-hidden="true"
-                  className="css-19bqh2r"
+                  className="css-6q0nyr-Svg"
                   focusable="false"
                   height={20}
                   viewBox="0 0 20 20"
@@ -135,21 +158,20 @@ exports[`UpdateProfileForm should render with required props 1`] = `
         </div>
       </div>
     </div>
-  </div>
-  <div
-    className="row"
-  >
     <div
       className="field"
+      data-testid="INPUT"
     >
       <label
         className="Label"
+        data-testid="LABEL"
         htmlFor="companyName"
       >
         Company Name
       </label>
       <div
         className="inputFeedbackGrouping"
+        data-testid="INPUT_FEEDBACK_GROUPING"
       >
         <input
           className="Input"
@@ -165,15 +187,18 @@ exports[`UpdateProfileForm should render with required props 1`] = `
     </div>
     <div
       className="field"
+      data-testid="INPUT"
     >
       <label
         className="Label"
+        data-testid="LABEL"
         htmlFor="companyRole"
       >
         Company Role
       </label>
       <div
         className="inputFeedbackGrouping"
+        data-testid="INPUT_FEEDBACK_GROUPING"
       >
         <input
           className="Input"
@@ -191,19 +216,14 @@ exports[`UpdateProfileForm should render with required props 1`] = `
   <div
     className="errorMessage"
   >
-    <div
-      className="Alert error"
-      role="alert"
-    >
-      
-    </div>
+    
   </div>
   <div
     className="buttonGrouping"
   >
     <button
       className="Button secondary fullWidth"
-      data-testid="Submit Step Button"
+      data-testid="SUBMIT_STEP_BUTTON"
       disabled={false}
       onClick={[Function]}
       tabIndex={0}

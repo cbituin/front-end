@@ -1,21 +1,24 @@
 import React from 'react';
-import { storiesOf } from '@storybook/react';
-import { withInfo } from '@storybook/addon-info';
-import { withKnobs, boolean, select, text } from '@storybook/addon-knobs';
 
 import Heading from '../Heading';
 
-storiesOf('Heading', module)
-  .addDecorator(withKnobs)
-  .add(
-    'default',
-    withInfo()(() => (
-      <Heading
-        id={text('id', 'heading1')}
-        hasHeadingLines={boolean('hasHeadingLines', true)}
-        theme={select('theme', ['gray', 'secondary', 'white'], 'gray')}
-      >
-        {text('children', 'Heading Component')}
-      </Heading>
-    )),
-  );
+export default {
+  component: Heading,
+  title: 'Heading',
+  argTypes: {
+    headingLevel: {
+      control: {
+        type: 'number',
+        min: 1,
+        max: 6,
+      },
+    },
+  },
+};
+
+const Template = arguments_ => <Heading {...arguments_} />;
+
+export const Default = Template.bind({});
+Default.args = {
+  text: `Heading Text`,
+};
